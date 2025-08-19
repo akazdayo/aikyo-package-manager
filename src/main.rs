@@ -1,5 +1,6 @@
 use clap::{Parser, Subcommand};
 mod add;
+mod manager;
 
 /// Aikyo Package Manager
 #[derive(Parser, Debug)]
@@ -22,11 +23,12 @@ enum SubCommands {
     Remove,
 }
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
     match cli.subcommand {
-        SubCommands::Add { url } => add::clone_from_git(url),
+        SubCommands::Add { url } => manager::Config::append_plugin(url.clone())?,
         SubCommands::Remove => println!("Removing plugin"),
     }
+    Ok(())
 }
