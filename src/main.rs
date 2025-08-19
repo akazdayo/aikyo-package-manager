@@ -25,9 +25,10 @@ enum SubCommands {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
+    let config = manager::Config::new()?;
 
     match cli.subcommand {
-        SubCommands::Add { url } => manager::Config::append_plugin(url.clone())?,
+        SubCommands::Add { url } => config.append_plugin(url.clone())?,
         SubCommands::Remove => println!("Removing plugin"),
     }
     Ok(())

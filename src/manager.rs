@@ -14,6 +14,22 @@ pub struct Config {
 }
 
 impl Config {
+    pub fn new() -> Result<Config, Box<dyn std::error::Error>> {
+        let path = Path::new("apm.toml");
+        let config: Config;
+
+        if path.is_file() {
+            config = Self::read_config("apm.toml".to_owned())?;
+        } else {
+            config = Config {
+                project: Project {
+                    plugins: Vec::new(),
+                },
+            };
+        }
+        Ok(config)
+    }
+
     fn read_config(path: String) -> Result<Config, Box<dyn std::error::Error>> {
         let mut content = String::new();
 
@@ -26,22 +42,10 @@ impl Config {
         Ok(toml::from_str(&content)?)
     }
 
-    pub fn append_plugin(plugin: String) -> Result<(), Box<dyn std::error::Error>> {
-        let path = Path::new("apm.toml");
-        let mut config: Config;
+    pub fn append_plugin(mut self, plugin: String) -> Result<(), Box<dyn std::error::Error>> {
+        self.project.plugins.push(plugin);
 
-        if path.is_file() {
-            config = Self::read_config("apm.toml".to_owned())?;
-        } else {
-            config = Config {
-                project: Project {
-                    plugins: Vec::new(),
-                },
-            };
-        }
-        config.project.plugins.push(plugin);
-
-        let data = toml::to_string(&config)?;
+        let data = toml::to_string(&self)?;
         let mut file = File::create("apm.toml")?; // 上書き保存/新規作成
         write!(file, "{}", data)?;
         file.flush()?;
