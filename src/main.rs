@@ -28,7 +28,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = manager::Config::new()?;
 
     match cli.subcommand {
-        SubCommands::Add { url } => config.append_plugin(url.clone())?,
+        SubCommands::Add { url } => {
+            add::clone_from_git(&url, &config.project.tools_dir)?;
+            config.append_plugin(url.clone())?;
+        }
         SubCommands::Remove => println!("Removing plugin"),
     }
     Ok(())

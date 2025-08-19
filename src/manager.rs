@@ -6,6 +6,7 @@ use std::path::Path;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Project {
     pub plugins: Vec<String>,
+    pub tools_dir: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -24,6 +25,7 @@ impl Config {
             config = Config {
                 project: Project {
                     plugins: Vec::new(),
+                    tools_dir: "./tools/".to_string(),
                 },
             };
         }
