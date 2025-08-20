@@ -55,9 +55,10 @@ impl Config {
         Ok(())
     }
 
-    pub fn append_plugin(mut self, plugin: String) -> Result<(), Box<dyn std::error::Error>> {
+    // TODO: 重複プラグインのチェック機能を追加する
+    pub fn append_plugin(&mut self, plugin: String) -> Result<(), Box<dyn std::error::Error>> {
         self.project.plugins.push(plugin);
-        Self::save_file(&self.project.tools_dir, &toml::to_string(&self)?)?;
+        Self::save_file(&"apm.toml".to_string(), &toml::to_string(&self)?)?; // BUG: should be "apm.toml"
         Ok(())
     }
 }
