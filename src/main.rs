@@ -1,5 +1,8 @@
+extern crate clap;
+extern crate regex;
+extern crate serde;
+
 use clap::{Parser, Subcommand};
-mod add;
 mod manager;
 mod sync;
 
@@ -24,24 +27,29 @@ enum SubCommands {
     Remove,
 
     Sync,
+
+    Init,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
     let config = manager::Config::new()?;
+    let sync = sync::Sync::new(&config.project);
 
     match cli.subcommand {
         SubCommands::Add { url } => {
-            add::clone_from_git(&url, &config.project.tools_dir)?;
+            // configだけ書いて、自動でSyncさせるようにしたい。
             config.append_plugin(url.clone())?;
         }
         SubCommands::Remove => println!("Removing plugin"),
         SubCommands::Sync => {
             // TODO: plugin削除
             // TODO: npm workspaceに追加とinstall
-            for x in config.project.plugins {
-                add::clone_from_git(&x, &config.project.tools_dir)?;
-            }
+
+            sync.sync()?;
+        }
+        SubCommands::Init => {
+            println!("Initialized!")
         }
     }
     Ok(())

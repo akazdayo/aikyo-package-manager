@@ -25,9 +25,10 @@ impl Config {
             config = Config {
                 project: Project {
                     plugins: Vec::new(),
-                    tools_dir: "./tools/".to_string(),
+                    tools_dir: "./tools".to_string(),
                 },
             };
+            Self::save_file(&"apm.toml".to_string(), &toml::to_string(&config)?)?;
         }
         Ok(config)
     }
@@ -44,14 +45,19 @@ impl Config {
         Ok(toml::from_str(&content)?)
     }
 
-    pub fn append_plugin(mut self, plugin: String) -> Result<(), Box<dyn std::error::Error>> {
-        self.project.plugins.push(plugin);
-
-        let data = toml::to_string(&self)?;
-        let mut file = File::create("apm.toml")?; // 上書き保存/新規作成
+    fn save_file(path: &String, data: &String) -> Result<(), std::io::Error> {
+        if let Some(parent) = Path::new(path).parent() {
+            fs::create_dir_all(parent)?;
+        }
+        let mut file = File::create(path)?;
         write!(file, "{}", data)?;
         file.flush()?;
+        Ok(())
+    }
 
+    pub fn append_plugin(mut self, plugin: String) -> Result<(), Box<dyn std::error::Error>> {
+        self.project.plugins.push(plugin);
+        Self::save_file(&self.project.tools_dir, &toml::to_string(&self)?)?;
         Ok(())
     }
 }
