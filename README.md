@@ -1,0 +1,85 @@
+# APM (Aikyo Package Manager)
+
+[Aikyo](https://github.com/marukun712/aikyo)のAI Companion用のRust製パッケージマネージャーです。
+
+## 概要
+
+APMは、Gitリポジトリを`tools/`ディレクトリに自動的にクローンし、`apm.toml`設定ファイルを通じて管理するツールです。プラグインシステムの構築と管理を簡単にします。
+
+## インストール
+
+```bash
+cargo build --release
+```
+
+## 使用方法
+
+### 初期化
+
+```bash
+apm init
+```
+
+### プラグインの追加
+
+```bash
+apm add <GitリポジトリのURL>
+```
+
+例：
+```bash
+apm add https://github.com/user/plugin-name.git
+```
+
+### プラグインの同期
+
+設定されたプラグインを`tools/`ディレクトリに同期（クローン）します：
+
+```bash
+apm sync
+```
+
+### その他のコマンド
+
+- `apm remove` - プラグインの削除（実装予定）
+
+## 設定ファイル
+
+`apm.toml`ファイルでプラグインを管理します：
+
+```toml
+[project]
+plugins = [
+    "https://github.com/user/plugin1.git",
+    "https://github.com/user/plugin2.git"
+]
+tools_dir = "./tools"
+```
+
+## 開発
+
+### ビルド
+
+```bash
+cargo build
+```
+
+### テスト実行
+
+```bash
+cargo test
+```
+
+### 型チェック
+
+```bash
+cargo check
+```
+
+## プロジェクト構成
+
+- `src/main.rs` - エントリーポイントとCLI定義
+- `src/manager.rs` - 設定ファイルの管理
+- `src/sync.rs` - プラグインの同期処理
+- `apm.toml` - プロジェクト設定ファイル
+- `tools/` - プラグインが配置されるディレクトリ
