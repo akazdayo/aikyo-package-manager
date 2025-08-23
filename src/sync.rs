@@ -1,4 +1,5 @@
 use crate::manager::Project;
+use anyhow::Result;
 use regex::Regex;
 use std::{
     fs,
@@ -6,16 +7,16 @@ use std::{
     process::{Command, Stdio},
 };
 
-pub struct Sync<'a> {
-    project: &'a Project,
+pub struct Sync {
+    project: Project,
 }
 
-impl<'a> Sync<'a> {
-    pub fn new(project: &'a Project) -> Self {
+impl Sync {
+    pub fn new(project: Project) -> Self {
         Self { project }
     }
 
-    fn check_exists(&self) -> Result<Vec<String>, std::io::Error> {
+    fn check_exists(&self) -> Result<Vec<String>> {
         // フォルダが存在しない場合は初期化して返却
         if !Path::new(&self.project.tools_dir).is_dir() {
             fs::create_dir_all(&self.project.tools_dir)?;
@@ -33,7 +34,7 @@ impl<'a> Sync<'a> {
         Ok(exist_dirs)
     }
 
-    pub fn parse_repositry_name(urls: &Vec<String>) -> Result<Vec<String>, regex::Error> {
+    pub fn parse_repositry_name(urls: &Vec<String>) -> Result<Vec<String>> {
         let mut names: Vec<String> = Vec::new();
         let re = Regex::new(r"/([^/]+)\.git$")?;
 
@@ -47,7 +48,7 @@ impl<'a> Sync<'a> {
         Ok(names)
     }
 
-    fn clone_from_git(url: &String, path: &String) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn clone_from_git(url: &String, path: &String) -> Result<()> {
         let original_dir = std::env::current_dir()?;
         let dir = Path::new(&path);
         if !dir.is_dir() {
@@ -66,10 +67,14 @@ impl<'a> Sync<'a> {
         Ok(())
     }
 
-    pub fn sync(&self) -> Result<(), Box<dyn std::error::Error>> {
+    // TODO: イテレータを使用してより関数型プログラミングスタイルにリファクタリング
+    // TODO: 並列処理でcloneを高速化する
+    // TODO: 既存プラグインの更新機能を追加する
+    pub fn sync(&self) -> Result<()> {
         let exist_plugins = &self.check_exists()?;
         let all_plugin_names = Self::parse_repositry_name(&self.project.plugins)?;
 
+        // TODO: zip()とfilter()を使ってより簡潔に書き換える
         let mut queued_plugins: Vec<&String> = Vec::new();
         for i in 0..all_plugin_names.len() {
             if !exist_plugins.contains(&all_plugin_names[i]) {

@@ -2,9 +2,11 @@ extern crate clap;
 extern crate regex;
 extern crate serde;
 
+use anyhow::Result;
 use clap::{Parser, Subcommand};
 mod manager;
 mod sync;
+mod template;
 
 // TODO: エラーハンドリングを改善するため専用のエラーモジュールを作成する
 // TODO: コマンドハンドラーを別の関数やモジュールに分離する
@@ -32,12 +34,20 @@ enum SubCommands {
     Sync,
 
     Init,
+
+    #[clap(arg_required_else_help = true)]
+    Create {
+        url: String,
+        /// Template name to use
+        #[clap(long)]
+        template: Option<String>,
+    },
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
     let mut config = manager::Config::new()?;
-    let sync = sync::Sync::new(&config.project);
+    let sync = sync::Sync::new(config.project.clone());
 
     // TODO: コマンド処理を個別のハンドラー関数に分離する
     // TODO: プラグイン追加後の自動同期機能を実装する
@@ -58,6 +68,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         SubCommands::Init => {
             println!("Initialized!")
+        }
+        SubCommands::Create { url, template } => {
+            if let Some(template) = template {
+                match template.as_str() {
+                    "blank" => {
+                        template::blank(&"./".to_string())?;
+                    }
+                    _ => {
+                        panic!("An undefined template has been entered.");
+                    }
+                }
+            }
+            println!("{}", url.clone());
         }
     }
     Ok(())

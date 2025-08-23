@@ -1,9 +1,10 @@
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::fs::{self, File};
 use std::io::{BufReader, Read, Write};
 use std::path::Path;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Project {
     pub plugins: Vec<String>,
     pub tools_dir: String,
@@ -52,6 +53,7 @@ impl Config {
         let mut file = File::create(path)?;
         write!(file, "{}", data)?;
         file.flush()?;
+
         Ok(())
     }
 
