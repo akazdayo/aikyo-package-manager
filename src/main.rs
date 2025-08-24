@@ -75,6 +75,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     "blank" => {
                         template::blank(&"./".to_string())?;
                     }
+                    "basic" => {
+                        template::basic(&"./".to_string())?;
+                    }
                     _ => {
                         panic!("An undefined template has been entered.");
                     }
