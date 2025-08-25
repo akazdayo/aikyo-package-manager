@@ -31,16 +31,17 @@ enum SubCommands {
     #[clap(arg_required_else_help = true)]
     Remove,
 
+    /// Sync from apm.toml
     Sync,
 
-    Init,
-
-    #[clap(arg_required_else_help = true)]
-    Create {
-        url: String,
-        /// Template name to use
-        #[clap(long)]
+    /// Create a new project or from a template
+    Init {
+        /// Template to use for initialization
+        #[clap(long, short)]
         template: Option<String>,
+
+        #[clap(long, action = clap::ArgAction::SetTrue)]
+        url: bool,
     },
 }
 
@@ -66,10 +67,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             sync.sync()?;
         }
-        SubCommands::Init => {
-            println!("Initialized!")
-        }
-        SubCommands::Create { url, template } => {
+        SubCommands::Init { template, url } => {
             if let Some(template) = template {
                 match template.as_str() {
                     "blank" => {
@@ -79,11 +77,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         template::basic(&"./".to_string())?;
                     }
                     _ => {
-                        panic!("An undefined template has been entered.");
+                        match url {
+                            true => {
+                                template::from_url(&template, &"./".to_string())?;
+                                println!("Initialized from {}!", &template);
+                                // URLからテンプレートを取得して初期化
+                            }
+                            _ => {
+                                panic!("ERROR: An undefined template has been entered.");
+                            }
+                        }
                     }
                 }
+            } else {
+                template::basic(&"./".to_string())?;
             }
-            println!("{}", url.clone());
+
+            println!("Initialized!")
         }
     }
     Ok(())

@@ -12,3 +12,8 @@ pub fn basic(path: &String) -> Result<()> {
     Sync::clone_from_git(&blank_url, path)?;
     Ok(())
 }
+
+pub fn from_url(url: &String, path: &String) -> Result<()> {
+    Sync::clone_from_git(url, path)?;
+    Ok(())
+}
