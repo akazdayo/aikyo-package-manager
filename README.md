@@ -4,7 +4,7 @@
 
 ## 概要
 
-APMは、Gitリポジトリを`tools/`ディレクトリに自動的にクローンし、`apm.toml`設定ファイルを通じて管理するツールです。プラグインシステムの構築と管理を簡単にします。
+APMは、Gitリポジトリを`apm_tools/`ディレクトリに自動的にクローンし、`apm.toml`設定ファイルを通じて管理するツールです。プラグインシステムの構築と管理を簡単にします。
 
 ## インストール
 
@@ -53,8 +53,12 @@ plugins = [
     "https://github.com/user/plugin1.git",
     "https://github.com/user/plugin2.git"
 ]
-tools_dir = "./tools"
+tools_dir = "./apm_tools"
 ```
+
+## プロジェクト構成
+- `apm.toml` - プロジェクト設定ファイル
+- `apm_tools/` - プラグインが配置されるディレクトリ
 
 ## 開発
 
@@ -75,11 +79,3 @@ cargo test
 ```bash
 cargo check
 ```
-
-## プロジェクト構成
-
-- `src/main.rs` - エントリーポイントとCLI定義
-- `src/manager.rs` - 設定ファイルの管理
-- `src/sync.rs` - プラグインの同期処理
-- `apm.toml` - プロジェクト設定ファイル
-- `tools/` - プラグインが配置されるディレクトリ
