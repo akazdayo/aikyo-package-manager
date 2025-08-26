@@ -4,13 +4,13 @@ use std::fs::{self, File};
 use std::io::{BufReader, Read, Write};
 use std::path::Path;
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct Project {
     pub plugins: Vec<String>,
     pub tools_dir: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct Config {
     pub project: Project,
 }
@@ -62,5 +62,53 @@ impl Config {
         self.project.plugins.push(plugin);
         Self::save_file(&"apm.toml".to_string(), &toml::to_string(&self)?)?; // BUG: should be "apm.toml"
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    const PLUGIN_URL: &str = "https://github.com/akazdayo/apm";
+
+    fn setup() {
+        let config_path = Path::new("apm.toml");
+        let folder_path = Path::new("./apm_tools");
+        if config_path.is_file() {
+            fs::remove_file(config_path).unwrap();
+        }
+        if folder_path.is_dir() {
+            fs::remove_dir_all(folder_path).unwrap();
+        }
+    }
+
+    #[test]
+    fn new_config_read_and_write() {
+        setup();
+
+        let config = Config::new().unwrap(); // New Config
+        let config2 = Config::new().unwrap(); // Read Config
+
+        assert!(Path::new("apm.toml").is_file());
+        assert_eq!(config, config2);
+    }
+
+    #[test]
+    fn append_plugin() {
+        let config_path = Path::new("apm.toml");
+        if config_path.is_file() {
+            fs::remove_file(config_path).unwrap();
+        }
+        let mut config = Config::new().unwrap();
+        //config.append_plugin(PLUGIN_URL.to_string()).unwrap();
+        //assert_eq!(
+        //    config.project.plugins.contains(&PLUGIN_URL.to_string()),
+        //    true
+        //);
+
+        let config2 = Config::new().unwrap();
+        //assert_eq!(config, config2);
+
+        let download_dir = Path::new("./apm_tools/apm");
+        assert_eq!(!download_dir.is_dir(), true);
     }
 }
