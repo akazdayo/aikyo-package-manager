@@ -1,19 +1,25 @@
 use crate::sync::Sync;
 use anyhow::Result;
 
-pub fn blank(path: &String) -> Result<()> {
-    let blank_url = "https://github.com/akazdayo/aikyo-blank-template".to_string();
-    Sync::clone_from_git(&blank_url, path)?;
+pub fn blank(path: &str) -> Result<()> {
+    Sync::clone_from_git(
+        "https://github.com/akazdayo/aikyo-blank-template",
+        &path,
+        Some("./blank_tamplate"),
+    )?;
     Ok(())
 }
 
-pub fn basic(path: &String) -> Result<()> {
-    let blank_url = "https://github.com/akazdayo/aikyo-basic-template".to_string();
-    Sync::clone_from_git(&blank_url, path)?;
+pub fn basic(path: &str) -> Result<()> {
+    Sync::clone_from_git(
+        "https://github.com/akazdayo/aikyo-basic-template",
+        path,
+        Some("./bacic_template"),
+    )?;
     Ok(())
 }
 
-pub fn from_url(url: &String, path: &String) -> Result<()> {
-    Sync::clone_from_git(url, path)?;
+pub fn from_url(url: &str, path: &str) -> Result<()> {
+    Sync::clone_from_git(url, path, None)?;
     Ok(())
 }

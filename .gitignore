@@ -1,1 +1,5 @@
 /target
+/apm_tools
+/plugins
+/tools
+apm.toml

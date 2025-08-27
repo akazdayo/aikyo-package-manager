@@ -1,9 +1,13 @@
 extern crate clap;
+extern crate env_logger;
+#[macro_use]
+extern crate log;
 extern crate regex;
 extern crate serde;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
+use log::Level;
 mod manager;
 mod sync;
 mod template;
@@ -46,6 +50,8 @@ enum SubCommands {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    env_logger::init();
+
     let cli = Cli::parse();
     let mut config = manager::Config::new()?;
     let sync = sync::Sync::new(config.project.clone());
@@ -64,36 +70,36 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         SubCommands::Sync => {
             // TODO: plugin削除
             // TODO: npm workspaceに追加とinstall
-
             sync.sync()?;
         }
         SubCommands::Init { template, url } => {
             if let Some(template) = template {
                 match template.as_str() {
                     "blank" => {
-                        template::blank(&"./".to_string())?;
+                        template::blank("./")?;
                     }
                     "basic" => {
-                        template::basic(&"./".to_string())?;
+                        template::basic("./")?;
                     }
                     _ => {
                         match url {
                             true => {
-                                template::from_url(&template, &"./".to_string())?;
+                                template::from_url(&template, "./")?;
                                 println!("Initialized from {}!", &template);
                                 // URLからテンプレートを取得して初期化
                             }
                             _ => {
+                                error!("An undefined template has been entered.");
                                 panic!("ERROR: An undefined template has been entered.");
                             }
                         }
                     }
                 }
             } else {
-                template::basic(&"./".to_string())?;
+                // Config::new()の実行時に自動的にapm.tomlが生成されるため
+                // 何もしない場合はapm.tomlのみ生成
+                println!("Initialized!");
             }
-
-            println!("Initialized!")
         }
     }
     Ok(())

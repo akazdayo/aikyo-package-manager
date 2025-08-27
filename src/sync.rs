@@ -1,11 +1,7 @@
 use crate::manager::Project;
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use regex::Regex;
-use std::{
-    fs,
-    path::Path,
-    process::{Command, Stdio},
-};
+use std::{fs, path::Path, process::Command};
 
 pub struct Sync {
     project: Project,
@@ -48,22 +44,24 @@ impl Sync {
         Ok(names)
     }
 
-    pub fn clone_from_git(url: &String, path: &String) -> Result<()> {
-        let original_dir = std::env::current_dir()?;
-        let dir = Path::new(&path);
+    pub fn clone_from_git(url: &str, tools_dir: &str, target_dir: Option<&str>) -> Result<()> {
+        let dir = Path::new(tools_dir);
         if !dir.is_dir() {
-            fs::create_dir(dir)?;
+            fs::create_dir_all(dir)?;
         }
-        std::env::set_current_dir(path)?;
 
-        Command::new("git")
-            .arg("clone")
-            .arg(url)
-            .stdout(Stdio::piped())
-            .spawn()?
-            .wait()?;
+        let mut command = Command::new("git");
+        command.current_dir(tools_dir).arg("clone").arg(url);
 
-        std::env::set_current_dir(original_dir)?;
+        if let Some(dir) = target_dir {
+            command.arg(dir);
+        }
+
+        let status = command.status()?;
+        if !status.success() {
+            return Err(anyhow!("git clone failed"));
+        }
+
         Ok(())
     }
 
@@ -81,10 +79,11 @@ impl Sync {
                 queued_plugins.push(&self.project.plugins[i]);
             }
         }
+        println!("Clone queued plugins: {:?}", queued_plugins);
 
         // Clone all plugins
         for plugin in queued_plugins {
-            Self::clone_from_git(plugin, &self.project.tools_dir)?;
+            Self::clone_from_git(plugin, &self.project.tools_dir, None)?;
         }
         Ok(())
     }

@@ -79,3 +79,7 @@ cargo test
 ```bash
 cargo check
 ```
+
+## トラブルシューティング
+### Syncしてもクローンされない
+- apm.tomlに含まれているURLの末尾に`.git`が含まれていない

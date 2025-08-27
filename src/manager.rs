@@ -21,7 +21,7 @@ impl Config {
         let config: Config;
 
         if path.is_file() {
-            config = Self::read_config("apm.toml".to_owned())?;
+            config = Self::read_config("apm.toml")?;
         } else {
             config = Config {
                 project: Project {
@@ -29,12 +29,12 @@ impl Config {
                     tools_dir: "./apm_tools".to_string(),
                 },
             };
-            Self::save_file(&"apm.toml".to_string(), &toml::to_string(&config)?)?;
+            Self::save_file("apm.toml", &toml::to_string(&config)?)?;
         }
         Ok(config)
     }
 
-    fn read_config(path: String) -> Result<Config, Box<dyn std::error::Error>> {
+    fn read_config(path: &str) -> Result<Config, Box<dyn std::error::Error>> {
         let mut content = String::new();
 
         let mut fr = fs::File::open(path)
@@ -46,7 +46,7 @@ impl Config {
         Ok(toml::from_str(&content)?)
     }
 
-    fn save_file(path: &String, data: &String) -> Result<(), std::io::Error> {
+    fn save_file(path: &str, data: &String) -> Result<(), std::io::Error> {
         if let Some(parent) = Path::new(path).parent() {
             fs::create_dir_all(parent)?;
         }
@@ -60,7 +60,7 @@ impl Config {
     // TODO: 重複プラグインのチェック機能を追加する
     pub fn append_plugin(&mut self, plugin: String) -> Result<(), Box<dyn std::error::Error>> {
         self.project.plugins.push(plugin);
-        Self::save_file(&"apm.toml".to_string(), &toml::to_string(&self)?)?; // BUG: should be "apm.toml"
+        Self::save_file("apm.toml", &toml::to_string(&self)?)?; // BUG: should be "apm.toml"
         Ok(())
     }
 }
@@ -68,8 +68,6 @@ impl Config {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const PLUGIN_URL: &str = "https://github.com/akazdayo/apm";
-
     fn setup() {
         let config_path = Path::new("apm.toml");
         let folder_path = Path::new("./apm_tools");
