@@ -9,7 +9,7 @@ APMは、Gitリポジトリを`apm_tools/`ディレクトリに自動的にク�
 ## インストール
 
 ```bash
-cargo build --release
+brew install akazdayo/tap/apm
 ```
 
 ## 使用方法
