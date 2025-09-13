@@ -4,7 +4,7 @@
 
 ## 概要
 
-APMは、Gitリポジトリを`apm_tools/`ディレクトリに自動的にクローンし、`apm.toml`設定ファイルを通じて管理するツールです。プラグインシステムの構築と管理を簡単にします。
+APMは、Gitリポジトリを`aikyo_dependencies/`ディレクトリに自動的にクローンし、`apm.toml`設定ファイルを通じて管理するツールです。プラグインシステムの構築と管理を簡単にします。
 
 ## インストール
 
@@ -53,12 +53,12 @@ plugins = [
     "https://github.com/user/plugin1.git",
     "https://github.com/user/plugin2.git"
 ]
-tools_dir = "./apm_tools"
+tools_dir = "./aikyo_dependencies"
 ```
 
 ## プロジェクト構成
 - `apm.toml` - プロジェクト設定ファイル
-- `apm_tools/` - プラグインが配置されるディレクトリ
+- `aikyo_dependencies/` - プラグインが配置されるディレクトリ
 
 ## 開発
 

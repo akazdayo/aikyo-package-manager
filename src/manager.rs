@@ -26,7 +26,7 @@ impl Config {
             config = Config {
                 project: Project {
                     plugins: Vec::new(),
-                    tools_dir: "./apm_tools".to_string(),
+                    tools_dir: "./aikyo_dependencies".to_string(),
                 },
             };
             Self::save_file("apm.toml", &toml::to_string(&config)?)?;
